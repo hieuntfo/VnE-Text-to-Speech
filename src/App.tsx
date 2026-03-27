@@ -66,7 +66,14 @@ export default function App() {
         body: JSON.stringify({ text: inputText, voice: selectedVoice })
       });
       
-      const data = await response.json();
+      const textResponse = await response.text();
+      let data;
+      try {
+        data = JSON.parse(textResponse);
+      } catch (e) {
+        console.error("Non-JSON response:", textResponse);
+        throw new Error(`Server returned an invalid response: ${textResponse.substring(0, 50)}...`);
+      }
       
       if (!response.ok) {
         throw new Error(data.error || 'Failed to generate audio');

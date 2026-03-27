@@ -3,9 +3,6 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize Gemini API
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 // Helper to convert raw PCM (from Gemini TTS) to playable WAV format
 function getWavBytes(pcmData: Buffer, sampleRate: number = 24000): Buffer {
   const numChannels = 1;
@@ -59,7 +56,14 @@ async function startServer() {
       return res.status(400).json({ error: "Text is required" });
     }
 
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: "GEMINI_API_KEY is missing. Please configure it in the AI Studio Settings." });
+    }
+
     try {
+      const ai = new GoogleGenAI({ apiKey });
+      
       // 1. Generate Script using Gemini 3.1 Flash
       const scriptPrompt = `You are an expert social media scriptwriter for VnExpress. 
       Convert the following article into a short, engaging audio script suitable for a YouTube Short or TikTok.
