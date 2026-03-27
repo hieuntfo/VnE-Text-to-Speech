@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   LayoutDashboard, 
@@ -45,17 +45,58 @@ export default function App() {
   const [hasResult, setHasResult] = useState(false);
   const [inputText, setInputText] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [selectedVoice, setSelectedVoice] = useState('hn_male_xuantin_vdg_v2');
+  const [error, setError] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-  const handleConvert = () => {
+  const handleConvert = async () => {
     if (!inputText.trim()) return;
     setIsConverting(true);
     setHasResult(false);
+    setAudioUrl(null);
+    setError(null);
     
-    // Simulate API call
-    setTimeout(() => {
+    // The mock script that we pretend the AI generated
+    const scriptText = "Did you know that Vietnam's tech exports just hit a record high? Here's why it matters to you. According to VnExpress, the latest figures show a 15% surge in software outsourcing. Major players are shifting focus, creating thousands of new high-paying jobs. This isn't just a trend; it's a fundamental shift in the global supply chain. Want to stay ahead of the curve? Hit subscribe for more daily tech insights from VnExpress.";
+    
+    try {
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: scriptText, voice: selectedVoice })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate audio');
+      }
+      
+      // VBee usually returns the URL in `download` or `audio_link` or `url`
+      const url = data.download || data.audio_link || data.url;
+      if (url) {
+        setAudioUrl(url);
+      } else {
+        console.warn("Unexpected VBee response:", data);
+        throw new Error("Invalid response format from VBee API");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message);
+    } finally {
       setIsConverting(false);
       setHasResult(true);
-    }, 2500);
+    }
+  };
+
+  const togglePlay = () => {
+    if (!audioRef.current || !audioUrl) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
   };
 
   return (
@@ -129,10 +170,14 @@ export default function App() {
                     <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
                       <Mic size={14} /> Voice Tone
                     </label>
-                    <select className="w-full rounded-xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 appearance-none">
-                      <option>Deep Male (Authoritative)</option>
-                      <option>Storytelling Female (Engaging)</option>
-                      <option>Fast News (Dynamic)</option>
+                    <select 
+                      value={selectedVoice}
+                      onChange={(e) => setSelectedVoice(e.target.value)}
+                      className="w-full rounded-xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 appearance-none"
+                    >
+                      <option value="hn_male_xuantin_vdg_v2">Deep Male (Authoritative)</option>
+                      <option value="hn_female_ngoclam_vdg_v2">Storytelling Female (Engaging)</option>
+                      <option value="sg_male_minhhoang_vdg_v2">Fast News (Dynamic)</option>
                     </select>
                   </div>
                 </div>
@@ -205,7 +250,19 @@ export default function App() {
                   )}
 
                   <AnimatePresence>
-                    {hasResult && (
+                    {error && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="absolute inset-0 flex flex-col items-center justify-center text-red-500 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm p-6 text-center z-10"
+                      >
+                        <Wand2 size={48} className="mb-4 opacity-50" />
+                        <p className="font-semibold mb-2">Conversion Failed</p>
+                        <p className="text-sm opacity-80 max-w-sm">{error}</p>
+                      </motion.div>
+                    )}
+
+                    {hasResult && !error && (
                       <motion.div 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -234,11 +291,19 @@ export default function App() {
                 </div>
 
                 {/* Audio Player */}
-                <div className={`p-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800 transition-opacity duration-500 ${hasResult ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+                <div className={`p-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800 transition-opacity duration-500 ${hasResult && !error ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+                  <audio 
+                    ref={audioRef} 
+                    src={audioUrl || undefined} 
+                    onEnded={() => setIsPlaying(false)}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    className="hidden"
+                  />
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <button 
-                        onClick={() => setIsPlaying(!isPlaying)}
+                        onClick={togglePlay}
                         className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition-colors shadow-md shadow-red-600/20"
                       >
                         {isPlaying ? <Pause size={18} className="fill-current" /> : <Play size={18} className="fill-current ml-1" />}
@@ -248,12 +313,18 @@ export default function App() {
                       </button>
                     </div>
                     <div className="text-xs font-mono text-neutral-500">
-                      {isPlaying ? '00:12 / 00:45' : '00:00 / 00:45'}
+                      {isPlaying ? 'Playing...' : (audioUrl ? 'Ready' : '00:00 / 00:00')}
                     </div>
-                    <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-700 text-sm font-medium hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors">
+                    <a 
+                      href={audioUrl || '#'} 
+                      download="vnexpress-audio.mp3"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-700 text-sm font-medium hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
+                    >
                       <Download size={16} />
                       <span>Export</span>
-                    </button>
+                    </a>
                   </div>
                   {/* Waveform visualizer mock */}
                   <div className="h-8 flex items-end gap-1 w-full">
