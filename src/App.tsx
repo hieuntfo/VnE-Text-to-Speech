@@ -46,8 +46,9 @@ export default function App() {
   const [inputText, setInputText] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [selectedVoice, setSelectedVoice] = useState('hn_male_xuantin_vdg_v2');
+  const [selectedVoice, setSelectedVoice] = useState('Zephyr');
   const [error, setError] = useState<string | null>(null);
+  const [script, setScript] = useState({ hook: '', body: '', cta: '' });
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const handleConvert = async () => {
@@ -56,15 +57,13 @@ export default function App() {
     setHasResult(false);
     setAudioUrl(null);
     setError(null);
-    
-    // The mock script that we pretend the AI generated
-    const scriptText = "Did you know that Vietnam's tech exports just hit a record high? Here's why it matters to you. According to VnExpress, the latest figures show a 15% surge in software outsourcing. Major players are shifting focus, creating thousands of new high-paying jobs. This isn't just a trend; it's a fundamental shift in the global supply chain. Want to stay ahead of the curve? Hit subscribe for more daily tech insights from VnExpress.";
+    setScript({ hook: '', body: '', cta: '' });
     
     try {
-      const response = await fetch('/api/tts', {
+      const response = await fetch('/api/convert', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: scriptText, voice: selectedVoice })
+        body: JSON.stringify({ text: inputText, voice: selectedVoice })
       });
       
       const data = await response.json();
@@ -73,13 +72,11 @@ export default function App() {
         throw new Error(data.error || 'Failed to generate audio');
       }
       
-      // VBee usually returns the URL in `download` or `audio_link` or `url`
-      const url = data.download || data.audio_link || data.url;
-      if (url) {
-        setAudioUrl(url);
-      } else {
-        console.warn("Unexpected VBee response:", data);
-        throw new Error("Invalid response format from VBee API");
+      if (data.audio) {
+        setAudioUrl(data.audio);
+      }
+      if (data.script) {
+        setScript(data.script);
       }
     } catch (err: any) {
       console.error(err);
@@ -175,9 +172,9 @@ export default function App() {
                       onChange={(e) => setSelectedVoice(e.target.value)}
                       className="w-full rounded-xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 appearance-none"
                     >
-                      <option value="hn_male_xuantin_vdg_v2">Deep Male (Authoritative)</option>
-                      <option value="hn_female_ngoclam_vdg_v2">Storytelling Female (Engaging)</option>
-                      <option value="sg_male_minhhoang_vdg_v2">Fast News (Dynamic)</option>
+                      <option value="Zephyr">Deep Male (Authoritative)</option>
+                      <option value="Kore">Storytelling Female (Engaging)</option>
+                      <option value="Puck">Fast News (Dynamic)</option>
                     </select>
                   </div>
                 </div>
@@ -268,23 +265,29 @@ export default function App() {
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-6 text-sm leading-relaxed"
                       >
-                        <div>
-                          <span className="inline-block px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-md mb-2">HOOK</span>
-                          <p className="font-medium text-lg">Did you know that Vietnam's tech exports just hit a record high? Here's why it matters to you.</p>
-                          <div className="text-xs text-neutral-400 mt-1 font-mono">&lt;prosody rate="fast" pitch="high"&gt;</div>
-                        </div>
+                        {script.hook && (
+                          <div>
+                            <span className="inline-block px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-md mb-2">HOOK</span>
+                            <p className="font-medium text-lg">{script.hook}</p>
+                            <div className="text-xs text-neutral-400 mt-1 font-mono">&lt;prosody rate="fast" pitch="high"&gt;</div>
+                          </div>
+                        )}
                         
-                        <div>
-                          <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-md mb-2">BODY</span>
-                          <p>According to VnExpress, the latest figures show a 15% surge in software outsourcing. Major players are shifting focus, creating thousands of new high-paying jobs. This isn't just a trend; it's a fundamental shift in the global supply chain.</p>
-                          <div className="text-xs text-neutral-400 mt-1 font-mono">&lt;break time="500ms"/&gt; &lt;emphasis level="strong"&gt;</div>
-                        </div>
+                        {script.body && (
+                          <div>
+                            <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-md mb-2">BODY</span>
+                            <p>{script.body}</p>
+                            <div className="text-xs text-neutral-400 mt-1 font-mono">&lt;break time="500ms"/&gt; &lt;emphasis level="strong"&gt;</div>
+                          </div>
+                        )}
 
-                        <div>
-                          <span className="inline-block px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-md mb-2">CTA</span>
-                          <p className="font-semibold">Want to stay ahead of the curve? Hit subscribe for more daily tech insights from VnExpress.</p>
-                          <div className="text-xs text-neutral-400 mt-1 font-mono">&lt;prosody rate="slow"&gt;</div>
-                        </div>
+                        {script.cta && (
+                          <div>
+                            <span className="inline-block px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-md mb-2">CTA</span>
+                            <p className="font-semibold">{script.cta}</p>
+                            <div className="text-xs text-neutral-400 mt-1 font-mono">&lt;prosody rate="slow"&gt;</div>
+                          </div>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
