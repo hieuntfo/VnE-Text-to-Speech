@@ -21,6 +21,7 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [selectedVoice, setSelectedVoice] = useState('Zephyr');
+  const [targetCountry, setTargetCountry] = useState('Việt Nam (VN)');
   const [error, setError] = useState<string | null>(null);
   const [script, setScript] = useState({ hook: '', body: '', cta: '' });
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -37,7 +38,7 @@ export default function App() {
       const response = await fetch('/api/convert', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: inputText, voice: selectedVoice })
+        body: JSON.stringify({ text: inputText, voice: selectedVoice, targetCountry })
       });
       
       const textResponse = await response.text();
@@ -144,10 +145,15 @@ export default function App() {
                   <label className="text-[14px] text-vne-text-sec flex items-center gap-1">
                     <Globe size={14} /> Quốc gia mục tiêu
                   </label>
-                  <select className="w-full bg-vne-bg border border-vne-border p-2 text-[14px] focus:outline-none focus:border-vne-primary appearance-none rounded-none">
-                    <option>Hoa Kỳ (US)</option>
-                    <option>Úc (AU)</option>
-                    <option>Canada (CA)</option>
+                  <select 
+                    value={targetCountry}
+                    onChange={(e) => setTargetCountry(e.target.value)}
+                    className="w-full bg-vne-bg border border-vne-border p-2 text-[14px] focus:outline-none focus:border-vne-primary appearance-none rounded-none"
+                  >
+                    <option value="Việt Nam (VN)">Việt Nam (VN)</option>
+                    <option value="Hoa Kỳ (US)">Hoa Kỳ (US)</option>
+                    <option value="Úc (AU)">Úc (AU)</option>
+                    <option value="Canada (CA)">Canada (CA)</option>
                   </select>
                 </div>
                 <div className="space-y-2">

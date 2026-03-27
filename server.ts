@@ -50,7 +50,7 @@ async function startServer() {
   });
 
   app.post("/api/convert", async (req, res) => {
-    const { text, voice } = req.body;
+    const { text, voice, targetCountry } = req.body;
     
     if (!text) {
       return res.status(400).json({ error: "Text is required" });
@@ -67,6 +67,7 @@ async function startServer() {
       // 1. Generate Script using Gemini 3.1 Flash
       const scriptPrompt = `You are an expert social media scriptwriter for VnExpress. 
       Convert the following article into a short, engaging audio script suitable for a YouTube Short or TikTok.
+      IMPORTANT: Translate and adapt the script for the audience in ${targetCountry || 'Vietnam'}. The final script MUST be in the primary language of ${targetCountry || 'Vietnam'}.
       Format the output strictly as a JSON object with three keys: "hook", "body", and "cta".
       Keep it concise (under 100 words total).
       
