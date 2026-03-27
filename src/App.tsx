@@ -1,20 +1,15 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  LayoutDashboard, 
-  History, 
-  Settings, 
   Mic, 
   Globe, 
   Wand2,
   FileText,
   Activity,
-  Volume2
+  Volume2,
+  Menu,
+  Search,
+  User
 } from 'lucide-react';
 import AudioPlayer from './components/AudioPlayer';
 import DashboardCards from './components/DashboardCards';
@@ -83,203 +78,137 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 font-sans transition-colors duration-300">
-      {/* Sidebar */}
-      <aside className="w-20 flex-shrink-0 bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col items-center py-8 gap-8 z-10">
-        <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-red-600/20">
-          V
-        </div>
-        <nav className="flex flex-col gap-6 mt-4">
-          <button className="p-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-red-600 dark:text-red-500 transition-colors">
-            <LayoutDashboard size={24} />
-          </button>
-          <button className="p-3 rounded-xl text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-            <History size={24} />
-          </button>
-          <button className="p-3 rounded-xl text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-            <Settings size={24} />
-          </button>
-        </nav>
-      </aside>
-
-      {/* Main Workspace */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="h-20 flex items-center justify-between px-8 border-b border-neutral-200 dark:border-neutral-800 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm z-10">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Social Audio Converter</h1>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">VnExpress AI Editorial Tools</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-neutral-200 dark:bg-neutral-800 border-2 border-white dark:border-neutral-950 shadow-sm overflow-hidden">
-              <img src="https://picsum.photos/seed/avatar/100/100" alt="User" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+    <div className="min-h-screen bg-vne-bg text-vne-text font-sans">
+      {/* Top Navbar mimicking VnExpress */}
+      <header className="border-b border-vne-border bg-vne-bg">
+        <div className="max-w-[1160px] mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <button className="text-vne-text hover:text-vne-primary transition-colors">
+              <Menu size={24} />
+            </button>
+            <div className="font-serif text-2xl font-bold text-vne-primary tracking-tighter">
+              VnExpress
             </div>
+            <nav className="hidden md:flex items-center gap-4 text-[14px] font-bold">
+              <a href="#" className="hover:text-vne-primary transition-colors">Thời sự</a>
+              <a href="#" className="hover:text-vne-primary transition-colors">Góc nhìn</a>
+              <a href="#" className="hover:text-vne-primary transition-colors">Thế giới</a>
+              <a href="#" className="hover:text-vne-primary transition-colors">Kinh doanh</a>
+              <a href="#" className="hover:text-vne-primary transition-colors">Công nghệ</a>
+            </nav>
           </div>
-        </header>
+          <div className="flex items-center gap-4 text-vne-text-sec">
+            <button className="hover:text-vne-primary transition-colors"><Search size={20} /></button>
+            <button className="hover:text-vne-primary transition-colors flex items-center gap-1 text-[14px]">
+              <User size={20} /> Đăng nhập
+            </button>
+          </div>
+        </div>
+        <div className="border-t border-vne-border bg-vne-bg-sec">
+          <div className="max-w-[1160px] mx-auto px-4 h-10 flex items-center text-[14px] text-vne-text-sec gap-2">
+            <span>Công cụ Tòa soạn</span>
+            <span>/</span>
+            <span className="text-vne-primary font-bold">Social Audio Converter</span>
+          </div>
+        </div>
+      </header>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-7xl mx-auto space-y-8">
-            
-            {/* Conversion Area */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <main className="max-w-[1160px] mx-auto px-4 py-6">
+        <div className="mb-6 border-b border-vne-border pb-4">
+          <h1 className="font-serif text-[32px] font-bold leading-[1.4] text-vne-text">
+            Chuyển đổi bài viết thành Audio Social
+          </h1>
+          <p className="text-[14px] text-vne-text-sec mt-2">
+            Hệ thống tự động tóm tắt và tạo giọng đọc AI chuẩn báo chí.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Left Column: Input (60%) */}
+          <div className="lg:col-span-3 flex flex-col gap-6">
+            <div className="bg-vne-bg border border-vne-border p-4">
+              <div className="flex items-center gap-2 mb-4 border-b border-vne-border pb-2">
+                <FileText className="text-vne-primary" size={20} />
+                <h2 className="font-serif text-[18px] font-bold">Nội dung bài báo gốc</h2>
+              </div>
               
-              {/* Left Column: Input */}
-              <div className="flex flex-col gap-6 bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-                <div className="flex items-center gap-2 mb-2">
-                  <FileText className="text-red-600" size={20} />
-                  <h2 className="text-lg font-semibold">Original Article</h2>
-                </div>
-                
-                <textarea 
-                  className="flex-1 min-h-[300px] w-full resize-none rounded-2xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-shadow"
-                  placeholder="Paste the VnExpress article content here..."
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                />
+              <textarea 
+                className="w-full min-h-[400px] resize-y bg-vne-bg border border-vne-border p-4 font-serif text-[18px] leading-[1.6] text-vne-text focus:outline-none focus:border-vne-primary transition-colors"
+                placeholder="Dán toàn bộ nội dung bài báo VnExpress vào đây..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+              />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
-                      <Globe size={14} /> Target Country
-                    </label>
-                    <select className="w-full rounded-xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 appearance-none">
-                      <option>United States (US)</option>
-                      <option>Australia (AU)</option>
-                      <option>Canada (CA)</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
-                      <Mic size={14} /> Voice Tone
-                    </label>
-                    <select 
-                      value={selectedVoice}
-                      onChange={(e) => setSelectedVoice(e.target.value)}
-                      className="w-full rounded-xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 appearance-none"
-                    >
-                      <option value="Zephyr">Deep Male (Authoritative)</option>
-                      <option value="Kore">Storytelling Female (Engaging)</option>
-                      <option value="Puck">Fast News (Dynamic)</option>
-                    </select>
-                  </div>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <label className="text-[14px] text-vne-text-sec flex items-center gap-1">
+                    <Globe size={14} /> Quốc gia mục tiêu
+                  </label>
+                  <select className="w-full bg-vne-bg border border-vne-border p-2 text-[14px] focus:outline-none focus:border-vne-primary appearance-none rounded-none">
+                    <option>Hoa Kỳ (US)</option>
+                    <option>Úc (AU)</option>
+                    <option>Canada (CA)</option>
+                  </select>
                 </div>
-
-                <button 
-                  onClick={handleConvert}
-                  disabled={isConverting || !inputText.trim()}
-                  className="w-full py-4 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-semibold flex items-center justify-center gap-2 hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
-                >
-                  {isConverting ? (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                    >
-                      <Activity size={20} />
-                    </motion.div>
-                  ) : (
-                    <Wand2 size={20} className="group-hover:rotate-12 transition-transform" />
-                  )}
-                  {isConverting ? 'Processing AI Script...' : 'Convert & Generate Audio'}
-                  
-                  {/* Loading Progress Bar Effect */}
-                  {isConverting && (
-                    <motion.div 
-                      className="absolute bottom-0 left-0 h-1 bg-red-500"
-                      initial={{ width: "0%" }}
-                      animate={{ width: "100%" }}
-                      transition={{ duration: 2.5, ease: "easeInOut" }}
-                    />
-                  )}
-                </button>
+                <div className="space-y-2">
+                  <label className="text-[14px] text-vne-text-sec flex items-center gap-1">
+                    <Mic size={14} /> Giọng đọc (Voice Tone)
+                  </label>
+                  <select 
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="w-full bg-vne-bg border border-vne-border p-2 text-[14px] focus:outline-none focus:border-vne-primary appearance-none rounded-none"
+                  >
+                    <option value="Zephyr">Nam trầm ấm (Authoritative)</option>
+                    <option value="Kore">Nữ kể chuyện (Engaging)</option>
+                    <option value="Puck">Bản tin nhanh (Dynamic)</option>
+                  </select>
+                </div>
               </div>
 
-              {/* Right Column: Output */}
-              <div className="flex flex-col gap-6 bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm relative overflow-hidden">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Volume2 className="text-red-600" size={20} />
-                    <h2 className="text-lg font-semibold">Optimized Script & Audio</h2>
-                  </div>
-                  {hasResult && (
-                    <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold rounded-full uppercase tracking-wider">
-                      Ready
-                    </span>
-                  )}
+              <button 
+                onClick={handleConvert}
+                disabled={isConverting || !inputText.trim()}
+                className="w-full mt-6 py-3 bg-vne-primary text-white font-bold text-[16px] flex items-center justify-center gap-2 hover:bg-[#801b3e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded-none"
+              >
+                {isConverting ? (
+                  <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
+                    <Activity size={20} />
+                  </motion.div>
+                ) : (
+                  <Wand2 size={20} />
+                )}
+                {isConverting ? 'Đang xử lý AI...' : 'Chuyển đổi & Tạo Audio'}
+              </button>
+            </div>
+
+            {/* Analytics moved to left column bottom to fit layout */}
+            <div className="mt-2">
+              <h2 className="font-serif text-[18px] font-bold mb-4 border-b border-vne-border pb-2 flex items-center gap-2">
+                <Activity className="text-vne-primary" size={20} />
+                Hiệu suất & Thống kê
+              </h2>
+              <DashboardCards hasResult={hasResult} />
+            </div>
+          </div>
+
+          {/* Right Column: Output (40%) */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            <div className="bg-vne-bg-sec border border-vne-border p-4">
+              <div className="flex items-center justify-between mb-4 border-b border-vne-border pb-2">
+                <div className="flex items-center gap-2">
+                  <Volume2 className="text-vne-primary" size={20} />
+                  <h2 className="font-serif text-[18px] font-bold">Kịch bản & Audio</h2>
                 </div>
+                {hasResult && (
+                  <span className="text-[12px] text-vne-primary font-bold uppercase">
+                    Hoàn tất
+                  </span>
+                )}
+              </div>
 
-                <div className="flex-1 bg-neutral-50 dark:bg-neutral-950 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 overflow-y-auto relative">
-                  {!hasResult && !isConverting && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-neutral-400">
-                      <Wand2 size={48} className="mb-4 opacity-20" />
-                      <p className="text-sm">Your optimized script will appear here</p>
-                    </div>
-                  )}
-
-                  {isConverting && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-neutral-400">
-                      <div className="flex gap-1 mb-4">
-                        {[0, 1, 2].map((i) => (
-                          <motion.div
-                            key={i}
-                            className="w-2 h-2 bg-red-500 rounded-full"
-                            animate={{ y: ["0%", "-100%", "0%"] }}
-                            transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-sm animate-pulse">Analyzing content structure...</p>
-                    </div>
-                  )}
-
-                  <AnimatePresence>
-                    {error && (
-                      <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="absolute inset-0 flex flex-col items-center justify-center text-red-500 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm p-6 text-center z-10"
-                      >
-                        <Wand2 size={48} className="mb-4 opacity-50" />
-                        <p className="font-semibold mb-2">Conversion Failed</p>
-                        <p className="text-sm opacity-80 max-w-sm">{error}</p>
-                      </motion.div>
-                    )}
-
-                    {hasResult && !error && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="space-y-6 text-sm leading-relaxed"
-                      >
-                        {script.hook && (
-                          <div>
-                            <span className="inline-block px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-md mb-2">HOOK</span>
-                            <p className="font-medium text-lg">{script.hook}</p>
-                            <div className="text-xs text-neutral-400 mt-1 font-mono">&lt;prosody rate="fast" pitch="high"&gt;</div>
-                          </div>
-                        )}
-                        
-                        {script.body && (
-                          <div>
-                            <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-md mb-2">BODY</span>
-                            <p>{script.body}</p>
-                            <div className="text-xs text-neutral-400 mt-1 font-mono">&lt;break time="500ms"/&gt; &lt;emphasis level="strong"&gt;</div>
-                          </div>
-                        )}
-
-                        {script.cta && (
-                          <div>
-                            <span className="inline-block px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-md mb-2">CTA</span>
-                            <p className="font-semibold">{script.cta}</p>
-                            <div className="text-xs text-neutral-400 mt-1 font-mono">&lt;prosody rate="slow"&gt;</div>
-                          </div>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Audio Player Component */}
+              {/* Audio Player */}
+              <div className="mb-6">
                 <AudioPlayer 
                   audioUrl={audioUrl}
                   isPlaying={isPlaying}
@@ -290,18 +219,75 @@ export default function App() {
                   error={error}
                 />
               </div>
-            </div>
 
-            {/* Analytics Dashboard */}
-            <div className="space-y-6">
-              <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
-                <Activity className="text-red-600" />
-                Performance Analytics
-              </h2>
-              
-              <DashboardCards hasResult={hasResult} />
-            </div>
+              {/* Script Output */}
+              <div className="bg-vne-bg border border-vne-border p-4 min-h-[300px] relative">
+                {!hasResult && !isConverting && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-vne-text-sec">
+                    <Wand2 size={32} className="mb-2 opacity-50" />
+                    <p className="text-[14px]">Kịch bản tối ưu sẽ hiển thị tại đây</p>
+                  </div>
+                )}
 
+                {isConverting && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-vne-text-sec">
+                    <div className="flex gap-1 mb-2">
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="w-2 h-2 bg-vne-primary rounded-none"
+                          animate={{ y: ["0%", "-100%", "0%"] }}
+                          transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-[14px]">Đang phân tích cấu trúc...</p>
+                  </div>
+                )}
+
+                <AnimatePresence>
+                  {error && (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="absolute inset-0 flex flex-col items-center justify-center text-vne-primary bg-vne-bg/90 p-4 text-center z-10"
+                    >
+                      <p className="font-bold mb-1">Lỗi chuyển đổi</p>
+                      <p className="text-[14px]">{error}</p>
+                    </motion.div>
+                  )}
+
+                  {hasResult && !error && (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="space-y-6"
+                    >
+                      {script.hook && (
+                        <div className="border-b border-vne-border pb-4">
+                          <span className="text-[12px] font-bold text-vne-primary uppercase mb-1 block">Phần mở đầu (Hook)</span>
+                          <p className="font-serif text-[18px] leading-[1.6] text-vne-text font-bold">{script.hook}</p>
+                        </div>
+                      )}
+                      
+                      {script.body && (
+                        <div className="border-b border-vne-border pb-4">
+                          <span className="text-[12px] font-bold text-vne-text-sec uppercase mb-1 block">Nội dung chính (Body)</span>
+                          <p className="font-serif text-[18px] leading-[1.6] text-vne-text">{script.body}</p>
+                        </div>
+                      )}
+
+                      {script.cta && (
+                        <div>
+                          <span className="text-[12px] font-bold text-vne-text-sec uppercase mb-1 block">Kêu gọi hành động (CTA)</span>
+                          <p className="font-serif text-[18px] leading-[1.6] text-vne-text font-bold">{script.cta}</p>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
           </div>
         </div>
       </main>

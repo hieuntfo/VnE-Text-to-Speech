@@ -1,1 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --color-vne-primary: #9f224e;
+  --color-vne-bg: #ffffff;
+  --color-vne-bg-sec: #f7f7f7;
+  --color-vne-text: #222222;
+  --color-vne-text-sec: #757575;
+  --color-vne-border: #e5e5e5;
+  
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-serif: Merriweather, "Times New Roman", serif;
+}
+
+body {
+  background-color: var(--color-vne-bg);
+  color: var(--color-vne-text);
+  font-family: var(--font-sans);
+}
